@@ -5,7 +5,7 @@
 </h2>
 
 <h2 align="center">
-   TRIỂN KHAI HỆ THỐNG EDUAI - TỰ ĐỘNG BÁO CÁO NHẬN XÉT VÀ SO SÁNH<br> 
+   TRIỂN KHAI HỆ THỐNG EDUAI-TỰ ĐỘNG BÁO CÁO NHẬN XÉT VÀ SO SÁNH<br> 
    BÁO CÁO HỌC TẬP TRÊN GOOGLE WORKSPACE (VLM)
 </h2>
 
@@ -82,20 +82,11 @@ còn đây là code của tôi , tôi muốn bạn sửa  cho tôi giống code 
 
 
 <p align="center">
-  <img src="Screenshot 2025-11-13 024253.png"Sơ đồ kiến trúc hệ thống">
+  <img src="https://drive.google.com/uc?export=view&id=1teOPpS7AKq7u7apV7XIuyoKEcfRtwEcA" width="450">
 </p>
 
 
 <div align="center">
-
----
-<p align="center">
-  <img src=""
-       alt="Mừng, Khánh"
-       width="200"
-       height="200"
-       style="border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,0.2); margin-bottom:10px;">
-</p>
 
 <h3>
   <a href="https://github.com/NgoThiMung"> Ngô Thị Mừng, Nguyễn Đình Khánh  </a>
