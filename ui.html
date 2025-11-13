@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #e6f7f3 0%, #f0f7ff 100%);
+      padding: 40px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: auto;
+      background: white;
+      padding: 36px 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      text-align: center;
+      font-weight: 700;
+      font-size: 24px;
+      color: #0b6a57;
+      margin-bottom: 24px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 16px;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #2d6cdf;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(45,108,223,0.15);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.02);
+      opacity: 0.9;
+    }
+
+    .btn.primary { background: #0b9d75; }
+    .btn.secondary { background: #2d6cdf; margin-left: 8px; }
+    .btn.compare { background: #ff7a00; margin-left: 8px; }
+
+    .status {
+      margin-top: 16px;
+      color: #555;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .result {
+      margin-top: 18px;
+      background: #f3faf7;
+      border: 1px dashed #0b9d75;
+      color: #0b9d75;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .ai-summary {
+      display: none;
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #f9f9ff;
+      border: 1px solid #d0d7ff;
+      color: #0d3b66;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .ai-summary h3 {
+      margin-top: 0;
+      color: #2d6cdf;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    iframe.dashboard {
+      width: 100%;
+      height: 420px;
+      margin-top: 30px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+    }
+
+    a { color: #0b9d75; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .progress {
+      display: none;
+      margin-top: 10px;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg,#0b9d75,#2d6cdf);
+      animation: progress 1.8s infinite linear;
+    }
+
+    @keyframes progress {
+      0% { width: 0; }
+      50% { width: 60%; }
+      100% { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>📊 Hệ thống phân tích giáo dục AI</h2>
+
+    <div class="grid">
+      <div>
+        <label>Khu vực</label>
+        <select id="region">
+          <option value="">-- Chọn khu vực --</option>
+          <option>Hà Nam</option>
+          <option>Lạng Sơn</option>
+          <option>Nam Định</option>
+          <option>Hưng Yên</option>
+        </select>
+      </div>
+      <div>
+        <label>Tên trường</label>
+        <input id="school" placeholder="VD: THPT Bắc Lý">
+      </div>
+    </div>
+
+    <label>📁 File Giai đoạn 1 (.xlsx)</label>
+    <input type="file" id="fileGD1" accept=".xlsx,.xls">
+
+    <label>📁 File Giai đoạn 2 (.xlsx)</label>
+    <input type="file" id="fileGD2" accept=".xlsx,.xls">
+
+    <div class="progress" id="progress"><div class="bar"></div></div>
+
+    <div style="text-align:center">
+      <button class="btn primary" id="uploadBtn" onclick="upload()">📤 Tải lên</button>
+      <button id="generateBtn" class="btn secondary">🤖 Tạo nhận xét AI</button>
+      <button id="compareBtn" class="btn compare">📈 So sánh 2 Giai đoạn</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div id="result" class="result"></div>
+
+    <div id="aiSummaryBox" class="ai-summary">
+      <h3>🤖 Nhận xét tổng quan từ AI</h3>
+      <div id="aiSummaryContent">(Chưa có dữ liệu)</div>
+    </div>
+
+    <iframe 
+  class="dashboard"
+  width="100%"
+  height="600"
+  src="https://lookerstudio.google.com/embed/reporting/262f2750-796e-4b9c-8c7a-e0d4846f056d/page/Un8eF"
+  frameborder="0"
+  style="border:0; border-radius:12px;"
+  allowfullscreen
+  sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+</iframe>
+
+  </div>
+
+<script>
+  /** State */
+  const uploaded = { gd1Id:null, gd2Id:null, gd1Url:null, gd2Url:null };
+
+  function v(id){return document.getElementById(id).value;}
+  function setStatus(t){document.getElementById("status").textContent=t;}
+  function showResult(html){const d=document.getElementById("result");d.style.display="block";d.innerHTML=html;}
+  function clean(s){return (s||"").toString().replace(/[\u00A0\r\n\t]+/g," ").replace(/\s{2,}/g," ").trim();}
+  function setGenerateEnabled(enabled){
+    document.getElementById("generateBtn").disabled=!enabled;
+    document.getElementById("compareBtn").disabled=!enabled;
+  }
+
+  /** Upload file Excel */
+  async function upload(){
+    const region=clean(v("region")),school=clean(v("school"));
+    const fileGD1=document.getElementById("fileGD1").files[0];
+    const fileGD2=document.getElementById("fileGD2").files[0];
+    const progress=document.getElementById("progress");
+    const uploadBtn=document.getElementById("uploadBtn");
+    if(!region||!school)return alert("⚠️ Nhập đủ Khu vực và Tên trường.");
+    if(!fileGD1&&!fileGD2)return alert("⚠️ Chọn ít nhất một file Excel.");
+    uploaded.gd1Id=uploaded.gd2Id=null;
+    setGenerateEnabled(false);
+    progress.style.display="block";uploadBtn.disabled=true;setStatus("📤 Đang tải lên...");
+    let html="🎉 <b>Đã tải lên thành công!</b><br><br>";
+    try{
+      if(fileGD1){
+        const r1=await readAndUpload(fileGD1,region,school,"Giai đoạn 1");
+        uploaded.gd1Id=r1.fileId;uploaded.gd1Url=r1.gsheetUrl;
+        html+=`✅ <b>Giai đoạn 1</b>: <a target="_blank" href="${r1.gsheetUrl}">Xem Sheet</a><br>`;
+      }
+      if(fileGD2){
+        const r2=await readAndUpload(fileGD2,region,school,"Giai đoạn 2");
+        uploaded.gd2Id=r2.fileId;uploaded.gd2Url=r2.gsheetUrl;
+        html+=`✅ <b>Giai đoạn 2</b>: <a target="_blank" href="${r2.gsheetUrl}">Xem Sheet</a><br>`;
+      }
+      showResult(html);setStatus("✅ Xong!");setGenerateEnabled(Boolean(uploaded.gd1Id||uploaded.gd2Id));
+    }catch(err){
+      console.error(err);showResult("❌ Lỗi tải lên: "+err.message);setStatus("⚠️ Thử lại hoặc kiểm tra file.");
+    }finally{progress.style.display="none";uploadBtn.disabled=false;}
+  }
+
+  function readAndUpload(file,region,school,stage){
+    return new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=e=>{
+        try{
+          const base64=e.target.result.split(",")[1];
+          google.script.run
+            .withSuccessHandler(res=>{
+              if(!res||!res.fileId){reject(new Error("Upload thất bại."));return;}
+              resolve(res);
+            })
+            .withFailureHandler(err=>reject(err))
+            .uploadStageFile(region,school,stage,file.name,base64);
+        }catch(err){reject(err);}
+      };
+      reader.onerror=()=>reject(new Error("Không đọc được file "+file.name));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /** Nút Tạo nhận xét */
+  document.getElementById("generateBtn").addEventListener("click",()=>{
+    const region=clean(v("region")),school=clean(v("school"));
+    if(!region||!school)return alert("⚠️ Nhập đủ thông tin!");
+    if(!uploaded.gd1Id&&!uploaded.gd2Id)return alert("⚠️ Cần upload file trước.");
+    const btn=document.getElementById("generateBtn");
+    btn.disabled=true;btn.innerText="⏳ Đang tạo...";
+    setStatus("🤖 Đang sinh nhận xét...");
+    google.script.run
+      .withSuccessHandler(payload=>{
+        let html="✅ <b>Đã tạo báo cáo!</b><br>";
+        if(payload.reportUrlGD1)html+=`📝 Nhận xét GD1: <a target="_blank" href="${payload.reportUrlGD1}">mở</a><br>`;
+        if(payload.reportUrlGD2)html+=`📝 Nhận xét GD2: <a target="_blank" href="${payload.reportUrlGD2}">mở</a><br>`;
+        if(payload.compareUrl)html+=`📈 So sánh 2 GD: <a target="_blank" href="${payload.compareUrl}">mở</a><br>`;
+        showResult(html);
+        setStatus("✅ Hoàn tất!");
+        btn.innerText="✅ Hoàn tất";
+      })
+      .withFailureHandler(err=>{
+        btn.disabled=false;btn.innerText="🤖 Tạo nhận xét AI";
+        showResult("❌ Lỗi: "+err.message);
+        setStatus("⚠️ Lỗi khi sinh báo cáo.");
+      })
+      .generateAllReports(region,school,uploaded.gd1Id,uploaded.gd2Id);
+  });
+
+  /** Nút So sánh 2 Giai đoạn */
+  document.getElementById("compareBtn").addEventListener("click",()=>{
+    const region=clean(v("region")),school=clean(v("school"));
+    if(!region||!school)return alert("⚠️ Nhập đủ thông tin!");
+    if(!uploaded.gd1Id||!uploaded.gd2Id)return alert("⚠️ Cần có đủ cả 2 file giai đoạn để so sánh.");
+    const btn=document.getElementById("compareBtn");
+    btn.disabled=true;btn.innerText="⏳ Đang so sánh...";
+    setStatus("📈 Đang tạo báo cáo so sánh...");
+    google.script.run
+      .withSuccessHandler(url=>{
+        showResult(`✅ <b>Đã tạo báo cáo so sánh:</b> <a target="_blank" href="${url}">Mở tài liệu</a>`);
+        setStatus("✅ Hoàn tất so sánh!");
+        btn.innerText="📈 So sánh 2 Giai đoạn";
+        btn.disabled=false;
+      })
+      .withFailureHandler(err=>{
+        showResult("❌ Lỗi khi tạo báo cáo so sánh: "+err.message);
+        setStatus("⚠️ Lỗi khi so sánh.");
+        btn.innerText="📈 So sánh 2 Giai đoạn";
+        btn.disabled=false;
+      })
+      .compareStagesAndUpdateReport_v2(region,school,uploaded.gd1Id,uploaded.gd2Id);
+  });
+
+  setGenerateEnabled(false);
+</script>
+</body>
+</html>
